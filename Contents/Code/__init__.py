@@ -26,7 +26,8 @@ from dateutil.parser import parse
 import traceback
 import urllib
 import urlparse
-import subtitles
+
+import localmedia
 
 if sys.version_info < (3, 0):
     from htmlentitydefs import name2codepoint
@@ -821,24 +822,10 @@ class XBMCNFO(PlexAgent):
                                 log.debug('Exception adding trailer file!')
 
                 if not preferences['localmediaagent'] and preferences['subtitle']:
-                    # Subtitle Support
-                    # Supports XBMC/Kodi subtitle filenames AND Plex subtitle filenames
-                    subtitle_files = []
                     # Look for subtitle files and process them
                     for item in media.items:
                         for part in item.parts:
-                            subtitle_files.extend(subtitles.process_subtitle_files(part))
-
-                    # If some subtitle files were found, log the details for debugging purposes
-                    if len(subtitle_files) > 0:
-                        log.debug("Listing details for {} subtitle file(s) found:".format(str(len(subtitle_files))))
-                        for subtitle_file in subtitle_files:
-                            log.debug("    {}".format(subtitle_file))
-
-                    # Remove subtitle files that are no longer present by comparing with the newly found files
-                    for item in media.items:
-                        for part in item.parts:
-                            subtitles.cleanup_subtitle_entries(part, subtitle_files)
+                            localmedia.findSubtitles(part)
 
                 log.info('---------------------')
                 log.info('Movie nfo Information')
